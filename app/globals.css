@@ -1,26 +1,133 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  /* Background */
+  --background: #FDFBF7;
   --foreground: #171717;
+
+  /* Brand Colors */
+  --color-primary: #DA291C;
+  --color-primary-hover: #b82318;
+  --color-secondary: #FFC72C;
+  --color-accent: #F4A900;
+
+  /* Text Colors */
+  --color-text-primary: #5a2e18;
+  --color-text-secondary: #8b7355;
+  --color-text-muted: #a8a8a8;
+
+  /* Surface Colors */
+  --color-surface: #ffffff;
+  --color-surface-secondary: #F8F8F6;
+
+  /* Status Colors */
+  --color-success: #22C55E;
+  --color-error: #EF4444;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-accent: var(--color-accent);
+  --font-sans: var(--font-outfit), Arial, Helvetica, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Hide scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom Select/Dropdown Styling */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px !important;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: none;
+}
+
+/* Light theme dropdown options */
+select option {
+  padding: 10px 12px;
+  background-color: #fff;
+  color: #1a1a2e;
+}
+
+/* Dark theme dropdown options */
+.dark select option {
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+/* Print Styles for Thermal Receipt */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    width: 80mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide everything by default */
+  body>* {
+    display: none !important;
+  }
+
+  /* Show only receipt container */
+  .print-receipt {
+    display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 80mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  .print-receipt .receipt-container {
+    width: 80mm !important;
+    padding: 2mm !important;
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  /* Hide no-print elements */
+  .no-print {
+    display: none !important;
+  }
 }

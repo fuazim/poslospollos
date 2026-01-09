@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useKioskStore } from '@/lib/store';
-import { Logo, Button, Card } from '@/app/components/ui';
+import { Logo, Button, Card } from '@/components/ui';
 
 export default function OrderTypeScreen() {
     const { setStep, setOrderType } = useKioskStore();
@@ -37,7 +37,7 @@ export default function OrderTypeScreen() {
                 <Card
                     onClick={() => handleSelect('dine-in')}
                     padding="xl"
-                    className="flex-1 max-w-lg aspect-[4/5] flex flex-col items-center justify-center"
+                    className="flex-1 max-w-lg aspect-4/5 flex flex-col items-center justify-center"
                 >
                     <div className="w-56 h-56 bg-[#F8F8F6] rounded-3xl flex items-center justify-center mb-10">
                         <div className="relative w-32 h-32">
@@ -60,7 +60,7 @@ export default function OrderTypeScreen() {
                 <Card
                     onClick={() => handleSelect('take-away')}
                     padding="xl"
-                    className="flex-1 max-w-lg aspect-[4/5] flex flex-col items-center justify-center"
+                    className="flex-1 max-w-lg aspect-4/5 flex flex-col items-center justify-center"
                 >
                     <div className="w-56 h-56 bg-[#F8F8F6] rounded-3xl flex items-center justify-center mb-10">
                         <div className="relative w-32 h-32">

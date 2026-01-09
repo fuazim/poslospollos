@@ -84,7 +84,7 @@ export default function LiveOrdersPage() {
             {/* Orders Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {filteredOrders.map((order) => (
-                    <div key={order.id} className={`rounded-2xl p-4 ${isDark ? 'bg-[#141414]' : 'bg-white'}`}>
+                    <div key={order.id} className={`rounded-2xl p-4 flex flex-col h-full ${isDark ? 'bg-[#141414]' : 'bg-white'}`}>
                         <div className="flex items-center justify-between mb-3">
                             <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>#{order.orderNumber}</span>
                             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: statusConfig[order.status].color }} />
@@ -100,13 +100,13 @@ export default function LiveOrdersPage() {
                             </div>
                         </div>
 
-                        <div className="space-y-0.5 mb-3">
+                        <div className="space-y-0.5 mb-3 flex-1">
                             {order.items.map((item, index) => (
                                 <p key={index} className={`text-[10px] ${isDark ? 'text-[#666]' : 'text-[#888]'}`}>{item}</p>
                             ))}
                         </div>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mt-auto">
                             <p className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>${order.total.toFixed(2)}</p>
                             <button className={`px-2.5 py-1 rounded-lg text-[9px] font-medium text-white ${order.status === 'ordered' ? 'bg-[#3B82F6]' :
                                     order.status === 'in-kitchen' ? 'bg-[#10B981]' :

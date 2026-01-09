@@ -2,10 +2,12 @@
 
 import { useKioskStore } from '@/lib/store';
 import { getActiveCategories, getProductsByCategory } from '@/lib/mock-data';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Logo, Button, ProductCard, CategoryButton } from '@/app/components/ui';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Logo, Button, ProductCard, CategoryButton } from '@/components/ui';
+import ProductCustomizationModal from './ProductCustomizationModal';
+import { Product, ProductOption } from '@/lib/types';
 
 export default function MenuScreen() {
     const {
@@ -21,6 +23,7 @@ export default function MenuScreen() {
     const categories = getActiveCategories();
     const [products, setProducts] = useState(getProductsByCategory(selectedCategoryId || categories[0]?.id));
     const [badgeBounce, setBadgeBounce] = useState(false);
+    const [customizingProduct, setCustomizingProduct] = useState<Product | null>(null);
 
     useEffect(() => {
         if (!selectedCategoryId && categories.length > 0) {
@@ -45,19 +48,19 @@ export default function MenuScreen() {
         return cart.find(item => item.product.id === productId);
     };
 
-    // Add product to cart with bounce animation
-    const handleAddProduct = (product: any) => {
-        const existingItem = getCartItem(product.id);
+    // Open customization modal
+    const handleProductClick = (product: Product) => {
+        setCustomizingProduct(product);
+    };
 
+    // Confirm add from modal
+    const handleConfirmAdd = (product: Product, options: ProductOption[], quantity: number) => {
         // Trigger badge bounce
         setBadgeBounce(true);
         setTimeout(() => setBadgeBounce(false), 400);
 
-        if (existingItem) {
-            updateCartItem(existingItem.id, existingItem.quantity + 1);
-        } else {
-            addToCart(product, [], 1);
-        }
+        addToCart(product, options, quantity);
+        setCustomizingProduct(null);
     };
 
     // Remove product from cart
@@ -87,9 +90,9 @@ export default function MenuScreen() {
     };
 
     return (
-        <div className="flex h-screen w-full bg-[#FDFBF7] overflow-hidden">
+        <div className="flex h-screen w-full bg-[#FDFBF7] overflow-hidden relative">
             {/* Sidebar */}
-            <aside className="w-[120px] flex flex-col items-center bg-white py-8 h-full shrink-0">
+            <aside className="w-[120px] flex flex-col items-center bg-white py-8 h-full shrink-0 shadow-sm z-20">
                 <Logo size="md" className="mb-8" />
 
                 <div className="flex-1 w-full overflow-y-auto no-scrollbar pb-28 px-3 space-y-5">
@@ -106,7 +109,7 @@ export default function MenuScreen() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col h-full relative">
+            <main className="flex-1 flex flex-col h-full relative z-10">
                 {/* Header */}
                 <header className="px-10 py-8 shrink-0">
                     <div className="flex items-end justify-between mb-6">
@@ -141,8 +144,9 @@ export default function MenuScreen() {
                                 imageUrl={product.imageUrl}
                                 isCombo={product.isCombo}
                                 isFeatured={index === 0}
+                                isActive={product.isActive}
                                 quantity={getProductQuantity(product.id)}
-                                onAdd={() => handleAddProduct(product)}
+                                onAdd={() => handleProductClick(product)}
                                 onRemove={() => handleRemoveProduct(product)}
                             />
                         ))}
@@ -150,11 +154,11 @@ export default function MenuScreen() {
                 </div>
 
                 {/* Bottom Navigation */}
-                <div className="absolute bottom-8 left-0 right-0 px-10 pointer-events-none flex justify-between items-end">
+                <div className="absolute bottom-8 left-0 right-0 px-10 pointer-events-none flex justify-between items-end z-20">
                     {/* Back Button */}
                     <button
                         onClick={() => setStep('order-type')}
-                        className="pointer-events-auto w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-[#5a2e18] active:bg-[#f5f5f5] active:scale-95 transition-all duration-150"
+                        className="pointer-events-auto w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-[#5a2e18] shadow-sm active:bg-[#f5f5f5] active:scale-95 transition-all duration-150"
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M19 12H5" />
@@ -166,7 +170,7 @@ export default function MenuScreen() {
                     {cartItemCount > 0 && (
                         <button
                             onClick={() => setStep('cart')}
-                            className="pointer-events-auto flex items-center gap-5 bg-[#DA291C] text-white px-8 py-5 rounded-2xl active:scale-[0.98] transition-all duration-150"
+                            className="pointer-events-auto flex items-center gap-5 bg-[#DA291C] text-white px-8 py-5 rounded-2xl shadow-xl active:scale-[0.98] transition-all duration-150"
                         >
                             <div className="relative">
                                 <Image src="/images/icons/basket.svg" alt="Cart" width={28} height={28} className="brightness-0 invert" />
@@ -196,6 +200,17 @@ export default function MenuScreen() {
                     )}
                 </div>
             </main>
+
+            {/* Customization Modal */}
+            <AnimatePresence>
+                {customizingProduct && (
+                    <ProductCustomizationModal 
+                        product={customizingProduct}
+                        onClose={() => setCustomizingProduct(null)}
+                        onConfirm={handleConfirmAdd}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }

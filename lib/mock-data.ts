@@ -78,7 +78,7 @@ export const mockProducts: Product[] = [
     {
         id: 'prod-1',
         categoryId: 'cat-1',
-        name: 'Gus Special (2pc)',
+        name: 'Gus Special (2pcs)',
         description: 'The boss\'s favorite - 2 pieces of our legendary fried chicken',
         basePrice: 8.99,
         imageUrl: '/images/products/gus-special.png',
@@ -89,7 +89,7 @@ export const mockProducts: Product[] = [
     {
         id: 'prod-2',
         categoryId: 'cat-1',
-        name: 'Heisenberg Meal (3pc)',
+        name: 'Heisenberg Meal (3pcs)',
         description: 'Say my name - 3 pieces of crispy perfection with your choice of side',
         basePrice: 11.99,
         imageUrl: '/images/products/heisenberg-meal.png',
@@ -100,7 +100,7 @@ export const mockProducts: Product[] = [
     {
         id: 'prod-3',
         categoryId: 'cat-1',
-        name: 'Blue Sky Wings (6pc)',
+        name: 'Blue Sky Wings (6pcs)',
         description: '99.1% pure crispy spicy wings - the purest in the Southwest',
         basePrice: 7.99,
         imageUrl: '/images/products/blue-sky-wings.png',
@@ -112,7 +112,7 @@ export const mockProducts: Product[] = [
     {
         id: 'prod-4',
         categoryId: 'cat-2',
-        name: 'Cartel Bucket (8pc)',
+        name: 'Cartel Bucket (8pcs)',
         description: 'For the whole crew - 8 pieces, 2 large sides, 4 biscuits',
         basePrice: 24.99,
         imageUrl: '/images/products/cartel-bucket.png',
@@ -123,7 +123,7 @@ export const mockProducts: Product[] = [
     {
         id: 'prod-5',
         categoryId: 'cat-2',
-        name: 'Empire Bucket (12pc)',
+        name: 'Empire Bucket (12pcs)',
         description: 'Build your empire - 12 pieces, 3 large sides, 6 biscuits',
         basePrice: 34.99,
         imageUrl: '/images/products/empire-bucket.png',

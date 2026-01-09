@@ -14,6 +14,7 @@ interface ProductCardProps {
     quantity?: number;
     onAdd?: () => void;
     onRemove?: () => void;
+    isActive?: boolean;
 }
 
 export default function ProductCard({
@@ -26,20 +27,30 @@ export default function ProductCard({
     quantity = 0,
     onAdd,
     onRemove,
+    isActive = true,
 }: ProductCardProps) {
     const [imageLoaded, setImageLoaded] = useState(false);
 
     return (
-        <Card padding="lg" className="flex flex-col relative">
+        <Card padding="lg" className={`flex flex-col relative transition-all ${!isActive ? 'grayscale opacity-80 pointer-events-none' : ''}`}>
+             {/* Sold Out Overlay */}
+             {!isActive && (
+                <div className="absolute inset-0 z-20 bg-white/50 flex items-center justify-center rounded-3xl">
+                    <div className="bg-black/80 text-white px-4 py-2 rounded-xl font-black text-xl uppercase tracking-widest transform -rotate-12">
+                        Sold Out
+                    </div>
+                </div>
+            )}
+
             {/* Featured Badge */}
-            {isFeatured && (
+            {isFeatured && isActive && (
                 <div className="absolute top-0 left-0 bg-[#DA291C] text-white text-xs font-bold uppercase px-5 py-2 rounded-br-2xl rounded-tl-3xl z-10">
                     Top Pick
                 </div>
             )}
 
             {/* Combo Badge */}
-            {isCombo && !isFeatured && (
+            {isCombo && !isFeatured && isActive && (
                 <div className="absolute top-0 left-0 bg-[#F4A900] text-[#5a2e18] text-xs font-bold uppercase px-5 py-2 rounded-br-2xl rounded-tl-3xl z-10">
                     Combo
                 </div>
@@ -55,6 +66,7 @@ export default function ProductCard({
                             fill
                             className={`object-cover transition-opacity duration-500 ease-out ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                             onLoad={() => setImageLoaded(true)}
+                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
                         />
                     </div>
                 ) : (
@@ -85,7 +97,8 @@ export default function ProductCard({
                                     e.stopPropagation();
                                     onRemove?.();
                                 }}
-                                className="w-10 h-10 rounded-xl bg-[#f5f5f5] text-[#5a2e18] flex items-center justify-center transition-all duration-150 active:bg-[#e8e8e8] active:scale-95"
+                                disabled={!isActive}
+                                className="w-10 h-10 rounded-xl bg-[#f5f5f5] text-[#5a2e18] flex items-center justify-center transition-all duration-150 active:bg-[#e8e8e8] active:scale-95 disabled:opacity-50"
                             >
                                 <span className="leading-none">−</span>
                             </button>
@@ -97,20 +110,26 @@ export default function ProductCard({
                                     e.stopPropagation();
                                     onAdd?.();
                                 }}
-                                className="w-10 h-10 rounded-xl bg-[#DA291C] text-white flex items-center justify-center transition-all duration-150 active:bg-[#b82318] active:scale-95"
+                                disabled={!isActive}
+                                className="w-10 h-10 rounded-xl bg-[#DA291C] text-white flex items-center justify-center transition-all duration-150 active:bg-[#b82318] active:scale-95 disabled:opacity-50"
                             >
-                                <span className="leading-none">+</span>
+                                <span className="leading-none text-xl">+</span>
                             </button>
                         </div>
                     ) : (
-                        <button
+                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onAdd?.();
                             }}
-                            className="w-10 h-10 rounded-xl bg-[#f5f5f5] text-[#5a2e18] flex items-center justify-center transition-all duration-150 active:bg-[#DA291C] active:text-white active:scale-95"
+                            disabled={!isActive}
+                            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-150 ${
+                                isActive 
+                                    ? 'bg-[#F8F8F6] text-[#5a2e18] hover:bg-[#DA291C] hover:text-white active:scale-95' 
+                                    : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                            }`}
                         >
-                            <span className="text-xl leading-none">+</span>
+                            <span className="text-3xl font-light pb-1 leading-none">+</span>
                         </button>
                     )}
                 </div>

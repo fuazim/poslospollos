@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTheme } from '@/lib/theme-context';
-import CustomSelect from '@/app/components/CustomSelect';
+import CustomSelect from '@/components/shared/CustomSelect';
 
 interface Order {
     id: string;

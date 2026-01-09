@@ -1,7 +1,7 @@
 'use client';
 
 import { useKioskStore } from '@/lib/store';
-import { Button } from '@/app/components/ui';
+import { Button } from '@/components/ui';
 
 export default function PaymentFailedScreen() {
     const { setStep, resetKiosk } = useKioskStore();

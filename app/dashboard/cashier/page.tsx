@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useTheme } from '@/lib/theme-context';
-import Image from 'next/image';
-import Receipt from '@/app/components/Receipt';
+import { printReceipt, PrintReceiptData } from '@/lib/print-receipt';
+import MenuProductCard from '@/components/ui/MenuProductCard';
 
 interface CartItem {
     id: string;
@@ -18,21 +18,6 @@ interface Product {
     price: number;
     category: string;
     imageUrl?: string;
-}
-
-interface ReceiptData {
-    orderNumber: string;
-    customerName: string;
-    orderType: 'dine-in' | 'take-away';
-    items: { name: string; quantity: number; price: number }[];
-    subtotal: number;
-    tax: number;
-    total: number;
-    paymentMethod: 'cash' | 'card';
-    cashReceived?: number;
-    change?: number;
-    cashierName: string;
-    date: Date;
 }
 
 const categories = ['All', 'Chicken', 'Buckets', 'Burgers', 'Sides', 'Drinks'];
@@ -51,7 +36,6 @@ const products: Product[] = [
 export default function CashierPOS() {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
-    const receiptRef = useRef<HTMLDivElement>(null);
 
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [cart, setCart] = useState<CartItem[]>([]);
@@ -61,7 +45,7 @@ export default function CashierPOS() {
     const [showReceiptModal, setShowReceiptModal] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
     const [cashReceived, setCashReceived] = useState('');
-    const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+    const [receiptData, setReceiptData] = useState<PrintReceiptData | null>(null);
     const [orderCounter, setOrderCounter] = useState(109);
 
     const filteredProducts = selectedCategory === 'All'
@@ -118,7 +102,7 @@ export default function CashierPOS() {
         const orderNum = `A${orderCounter}`;
         const cashAmount = parseFloat(cashReceived) || 0;
 
-        const data: ReceiptData = {
+        const data: PrintReceiptData = {
             orderNumber: orderNum,
             customerName: customerName || 'Guest',
             orderType,
@@ -140,7 +124,8 @@ export default function CashierPOS() {
     };
 
     const handlePrint = () => {
-        window.print();
+        if (!receiptData) return;
+        printReceipt(receiptData);
     };
 
     const finishOrder = () => {
@@ -179,21 +164,14 @@ export default function CashierPOS() {
 
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                         {filteredProducts.map(product => (
-                            <button
+                            <MenuProductCard
                                 key={product.id}
+                                name={product.name}
+                                price={product.price}
+                                imageUrl={product.imageUrl}
+                                mode="cashier"
                                 onClick={() => addToCart(product)}
-                                className={`rounded-2xl overflow-hidden text-left transition-transform active:scale-95 ${isDark ? 'bg-[#141414]' : 'bg-white'}`}
-                            >
-                                <div className={`relative aspect-square ${isDark ? 'bg-[#1a1a1a]' : 'bg-[#f5f5f5]'}`}>
-                                    {product.imageUrl && (
-                                        <Image src={product.imageUrl} alt={product.name} fill className="object-cover" />
-                                    )}
-                                </div>
-                                <div className="p-2.5">
-                                    <p className={`text-[10px] font-medium truncate ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>{product.name}</p>
-                                    <p className={`text-[11px] font-bold ${isDark ? 'text-[#F4A900]' : 'text-[#1a1a2e]'}`}>${product.price.toFixed(2)}</p>
-                                </div>
-                            </button>
+                            />
                         ))}
                     </div>
                 </div>
@@ -471,13 +449,6 @@ export default function CashierPOS() {
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-
-            {/* Hidden Receipt for Printing */}
-            {receiptData && (
-                <div className="print-receipt hidden print:block">
-                    <Receipt ref={receiptRef} data={receiptData} />
                 </div>
             )}
         </>

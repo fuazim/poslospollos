@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTheme } from '@/lib/theme-context';
-import CustomSelect from '@/app/components/CustomSelect';
+import CustomSelect from '@/components/shared/CustomSelect';
 interface User {
     id: string;
     name: string;
@@ -49,7 +49,7 @@ export default function AdminUsersPage() {
     };
 
     return (
-        <div className="p-6">
+        <div className="p-4 md:p-6 lg:p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>

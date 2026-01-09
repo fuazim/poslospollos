@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useKioskStore } from '@/lib/store';
 import { PaymentMethod } from '@/lib/types';
-import { Logo, Button, Card } from '@/app/components/ui';
+import { Logo, Button, Card } from '@/components/ui';
 
 export default function PaymentMethodScreen() {
     const { setStep, setPaymentMethod, getCartTotal, customerName, placeOrder } = useKioskStore();

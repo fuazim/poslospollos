@@ -14,6 +14,7 @@ interface CustomSelectProps {
     placeholder?: string;
     isDark?: boolean;
     className?: string;
+    bgClass?: string;
 }
 
 export default function CustomSelect({
@@ -23,6 +24,7 @@ export default function CustomSelect({
     placeholder = 'Select...',
     isDark = false,
     className = '',
+    bgClass,
 }: CustomSelectProps) {
     const [isOpen, setIsOpen] = useState(false);
     const selectRef = useRef<HTMLDivElement>(null);
@@ -40,16 +42,16 @@ export default function CustomSelect({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Determine background class
+    const backgroundClass = bgClass || (isDark ? 'bg-[#1a1a1a] hover:bg-[#222]' : 'bg-[#f5f5f5] hover:bg-[#eee]');
+
     return (
         <div ref={selectRef} className={`relative ${className}`}>
             {/* Trigger */}
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] text-left transition-all ${isDark
-                        ? 'bg-[#1a1a1a] text-white hover:bg-[#222]'
-                        : 'bg-[#f5f5f5] text-[#1a1a2e] hover:bg-[#eee]'
-                    } ${isOpen ? (isDark ? 'ring-1 ring-[#333]' : 'ring-1 ring-[#ddd]') : ''}`}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[11px] text-left transition-all ${backgroundClass} ${isDark ? 'text-white' : 'text-[#1a1a2e]'} ${isOpen ? (isDark ? 'ring-1 ring-[#333]' : 'ring-1 ring-[#ddd]') : ''}`}
             >
                 <span className={!selectedOption ? (isDark ? 'text-[#555]' : 'text-[#a8a8a8]') : ''}>
                     {selectedOption?.label || placeholder}

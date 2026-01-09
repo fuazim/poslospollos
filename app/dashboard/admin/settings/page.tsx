@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTheme } from '@/lib/theme-context';
-import CustomSelect from '@/app/components/CustomSelect';
+import CustomSelect from '@/components/shared/CustomSelect';
 
 interface SettingSection {
     id: string;
@@ -64,7 +64,7 @@ export default function AdminSettingsPage() {
     const [paperSize, setPaperSize] = useState('80');
 
     return (
-        <div className="p-6">
+        <div className="p-4 md:p-6 lg:p-8">
             {/* Header */}
             <div className="mb-6">
                 <h1 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>Settings</h1>

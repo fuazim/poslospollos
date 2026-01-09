@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useTheme } from '@/lib/theme-context';
-import CustomSelect from '@/app/components/CustomSelect';
-import * as XLSX from 'xlsx';
+import CustomSelect from '@/components/shared/CustomSelect';
 import { saveAs } from 'file-saver';
 
 interface Transaction {
@@ -82,71 +81,136 @@ export default function AdminInvoicesPage() {
         }
     };
 
-    // Export to Excel
-    const exportToExcel = () => {
+    // Export to Excel using exceljs
+    const exportToExcel = async () => {
+        const ExcelJS = (await import('exceljs')).default;
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Transactions');
+
+        // Define columns
+        worksheet.columns = [
+            { header: 'Order #', key: 'orderNumber', width: 10 },
+            { header: 'Date', key: 'date', width: 12 },
+            { header: 'Time', key: 'time', width: 10 },
+            { header: 'Customer', key: 'customer', width: 20 },
+            { header: 'Items', key: 'items', width: 40 },
+            { header: 'Subtotal', key: 'subtotal', width: 12 },
+            { header: 'Tax (10%)', key: 'tax', width: 12 },
+            { header: 'Total', key: 'total', width: 12 },
+            { header: 'Payment', key: 'payment', width: 15 },
+            { header: 'Cashier', key: 'cashier', width: 15 },
+        ];
+
+        // Add data
         const dataToExport = selectedTransactions.length > 0
             ? mockTransactions.filter(t => selectedTransactions.includes(t.id))
             : mockTransactions;
 
-        // Flatten data for Excel
-        const excelData = dataToExport.map(t => ({
-            'Order #': t.orderNumber,
-            'Date': t.date,
-            'Time': t.time,
-            'Customer': t.customer,
-            'Items': t.items.map(i => `${i.name} x${i.qty}`).join(', '),
-            'Subtotal': t.subtotal,
-            'Tax (10%)': t.tax,
-            'Total': t.total,
-            'Payment': t.paymentMethod,
-            'Cashier': t.cashier,
-        }));
+        dataToExport.forEach(t => {
+            worksheet.addRow({
+                orderNumber: t.orderNumber,
+                date: t.date,
+                time: t.time,
+                customer: t.customer,
+                items: t.items.map(i => `${i.name} x${i.qty}`).join(', '),
+                subtotal: t.subtotal,
+                tax: t.tax,
+                total: t.total,
+                payment: t.paymentMethod,
+                cashier: t.cashier,
+            });
+        });
 
-        // Create workbook
-        const ws = XLSX.utils.json_to_sheet(excelData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
-
-        // Add summary sheet
-        const summaryData = [
-            { 'Description': 'Total Transactions', 'Value': dataToExport.length },
-            { 'Description': 'Total Sales', 'Value': dataToExport.reduce((s, t) => s + t.subtotal, 0).toFixed(2) },
-            { 'Description': 'Total Tax Collected', 'Value': dataToExport.reduce((s, t) => s + t.tax, 0).toFixed(2) },
-            { 'Description': 'Grand Total', 'Value': dataToExport.reduce((s, t) => s + t.total, 0).toFixed(2) },
+        // Add Summary Sheet
+        const summarySheet = workbook.addWorksheet('Summary');
+        summarySheet.columns = [
+            { header: 'Description', key: 'desc', width: 25 },
+            { header: 'Value', key: 'val', width: 15 },
         ];
-        const wsSummary = XLSX.utils.json_to_sheet(summaryData);
-        XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
 
-        // Generate file
-        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        summarySheet.addRows([
+            { desc: 'Total Transactions', val: dataToExport.length },
+            { desc: 'Total Sales', val: dataToExport.reduce((s, t) => s + t.subtotal, 0).toFixed(2) },
+            { desc: 'Total Tax Collected', val: dataToExport.reduce((s, t) => s + t.tax, 0).toFixed(2) },
+            { desc: 'Grand Total', val: dataToExport.reduce((s, t) => s + t.total, 0).toFixed(2) },
+        ]);
+
+        // Style the headers
+        [worksheet, summarySheet].forEach(sheet => {
+            sheet.getRow(1).font = { bold: true };
+        });
+
+        // Generate buffer
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         saveAs(blob, `LosPollos_Transactions_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
-    // Export Tax Report
-    const exportTaxReport = () => {
-        const taxData = [
-            { 'Period': taxSummary.period },
-            { 'Business': 'Los Pollos Hermanos' },
-            { 'Address': '308 Negra Arroyo Lane, Albuquerque, NM 87104' },
-            { 'NPWP': '01.234.567.8-901.000' },
-            {},
-            { 'Description': 'Gross Sales', 'Amount': taxSummary.totalSales },
-            { 'Description': `Tax Collected (${taxSummary.taxRate}%)`, 'Amount': taxSummary.totalTax },
-            { 'Description': 'Net Sales', 'Amount': taxSummary.netSales },
+    // Export Tax Report (Excel)
+    const exportTaxReport = async () => {
+        const ExcelJS = (await import('exceljs')).default;
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Tax Report');
+
+        worksheet.columns = [
+            { header: 'Description', key: 'desc', width: 30 },
+            { header: 'Amount', key: 'amount', width: 20 },
         ];
 
-        const ws = XLSX.utils.json_to_sheet(taxData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Tax Report');
+        worksheet.addRows([
+            { desc: 'Period', amount: taxSummary.period },
+            { desc: 'Business', amount: 'Los Pollos Hermanos' },
+            { desc: 'Address', amount: '308 Negra Arroyo Lane' },
+            { desc: 'NPWP', amount: '01.234.567.8-901.000' },
+            { desc: '', amount: '' },
+            { desc: 'Gross Sales', amount: taxSummary.totalSales },
+            { desc: `Tax Collected (${taxSummary.taxRate}%)`, amount: taxSummary.totalTax },
+            { desc: 'Net Sales', amount: taxSummary.netSales },
+        ]);
 
-        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        worksheet.getRow(1).font = { bold: true };
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         saveAs(blob, `LosPollos_TaxReport_${taxSummary.period.replace(' ', '_')}.xlsx`);
     };
 
+    // Export to PDF
+    const exportToPDF = async () => {
+        const dataToExport = selectedTransactions.length > 0
+            ? mockTransactions.filter(t => selectedTransactions.includes(t.id))
+            : mockTransactions;
+
+        const { pdf } = await import('@react-pdf/renderer');
+        const { InvoicePDF } = await import('@/components/pdf/InvoicePDF');
+
+        const blob = await pdf(
+            <InvoicePDF transactions={dataToExport} period={period} />
+        ).toBlob();
+        
+        saveAs(blob, `LosPollos_Invoice_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+
+    // Export Tax Report PDF
+    const exportTaxReportPDF = async () => {
+        const { pdf } = await import('@react-pdf/renderer');
+        const { TaxReportPDF } = await import('@/components/pdf/InvoicePDF');
+
+        const blob = await pdf(
+            <TaxReportPDF 
+                period={taxSummary.period}
+                totalSales={taxSummary.totalSales}
+                totalTax={taxSummary.totalTax}
+                netSales={taxSummary.netSales}
+                taxRate={taxSummary.taxRate}
+            />
+        ).toBlob();
+
+        saveAs(blob, `LosPollos_TaxReport_${taxSummary.period.replace(' ', '_')}.pdf`);
+    };
+
     return (
-        <div className="p-6">
+        <div className="p-4 md:p-6 lg:p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
@@ -205,17 +269,32 @@ export default function AdminInvoicesPage() {
                                 </span>
                             )}
                         </div>
-                        <button
-                            onClick={exportToExcel}
-                            className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-white rounded-xl text-[11px] font-medium active:scale-95 transition-transform"
-                        >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                                <polyline points="7 10 12 15 17 10" />
-                                <line x1="12" y1="15" x2="12" y2="3" />
-                            </svg>
-                            Export Excel
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={exportToExcel}
+                                className="flex items-center gap-2 px-4 py-2 bg-[#10B981] text-white rounded-xl text-[11px] font-medium active:scale-95 transition-transform"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                Export Excel
+                            </button>
+                            <button
+                                onClick={exportToPDF}
+                                className="flex items-center gap-2 px-4 py-2 bg-[#F4A900] text-[#1a1a2e] rounded-xl text-[11px] font-medium active:scale-95 transition-transform"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                    <path d="M14 2v6h6" />
+                                    <path d="M16 13H8" />
+                                    <path d="M16 17H8" />
+                                    <path d="M10 9H8" />
+                                </svg>
+                                Export PDF
+                            </button>
+                        </div>
                     </div>
 
                     {/* Transactions Table */}
@@ -366,6 +445,19 @@ export default function AdminInvoicesPage() {
                                 <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
                             </svg>
                             Export Tax Report (Excel)
+                        </button>
+                        <button
+                            onClick={exportTaxReportPDF}
+                            className="w-full flex items-center justify-center gap-2 py-3 mt-2 bg-[#F4A900] text-[#1a1a2e] rounded-xl text-[11px] font-semibold active:scale-95 transition-transform"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                                <path d="M14 2v6h6" />
+                                <path d="M16 13H8" />
+                                <path d="M16 17H8" />
+                                <path d="M10 9H8" />
+                            </svg>
+                            Export Tax Report (PDF)
                         </button>
                     </div>
                 </div>

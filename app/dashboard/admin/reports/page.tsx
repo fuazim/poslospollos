@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTheme } from '@/lib/theme-context';
-import CustomSelect from '@/app/components/CustomSelect';
+import CustomSelect from '@/components/shared/CustomSelect';
 
 const mockSalesData = {
     today: { revenue: 4825.50, orders: 127, avgOrder: 38.01 },
@@ -44,7 +44,7 @@ export default function AdminReportsPage() {
     const maxRevenue = Math.max(...mockDailyRevenue.map(d => d.revenue));
 
     return (
-        <div className="p-6">
+        <div className="p-4 md:p-6 lg:p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
@@ -151,7 +151,7 @@ export default function AdminReportsPage() {
                                         ${(data.revenue / 1000).toFixed(1)}k
                                     </span>
                                     <div
-                                        className="w-full bg-gradient-to-t from-[#8B5CF6] to-[#A78BFA] rounded-lg transition-all duration-300"
+                                        className="w-full bg-linear-to-t from-[#8B5CF6] to-[#A78BFA] rounded-lg transition-all duration-300"
                                         style={{ height: `${(data.revenue / maxRevenue) * 100}px` }}
                                     />
                                     <span className={`text-[10px] ${isDark ? 'text-[#555]' : 'text-[#a8a8a8]'}`}>{data.day}</span>

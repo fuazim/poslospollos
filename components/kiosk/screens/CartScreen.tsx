@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useKioskStore } from '@/lib/store';
-import { Button, Card } from '@/app/components/ui';
+import { Button, Card } from '@/components/ui';
 
 export default function CartScreen() {
     const {

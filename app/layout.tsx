@@ -14,6 +14,9 @@ export const metadata: Metadata = {
     default: "Los Pollos Hermanos",
   },
   description: "Los Pollos Hermanos - Restaurant Management System",
+  icons: {
+    icon: "/images/logos/los-pollos-logo.png",
+  },
 };
 
 export default function RootLayout({

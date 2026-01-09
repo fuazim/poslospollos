@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useKioskStore } from '@/lib/store';
-import { Button } from '@/app/components/ui';
+import { Button } from '@/components/ui';
 
 export default function PaymentSuccessScreen() {
     const { orderNumber, customerName, orderType, getCartTotal, resetKiosk } = useKioskStore();

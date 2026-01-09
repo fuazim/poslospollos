@@ -19,6 +19,10 @@ interface KioskState {
     // Language
     language: Language;
     setLanguage: (lang: Language) => void;
+    
+    // Accessibility
+    isHighContrast: boolean;
+    toggleHighContrast: () => void;
 
     // Order type
     orderType: OrderType | null;
@@ -86,6 +90,13 @@ export const useKioskStore = create<KioskState>((set, get) => ({
     // Language
     setLanguage: (lang) => {
         set({ language: lang });
+        get().updateLastInteraction();
+    },
+
+    // Accessibility
+    isHighContrast: false,
+    toggleHighContrast: () => {
+        set((state) => ({ isHighContrast: !state.isHighContrast }));
         get().updateLastInteraction();
     },
 

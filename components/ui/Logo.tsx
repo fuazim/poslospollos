@@ -23,6 +23,7 @@ export default function Logo({ size = 'md', className = '' }: LogoProps) {
                 fill
                 className="object-contain"
                 priority
+                sizes="(max-width: 768px) 100px, 200px"
             />
         </div>
     );

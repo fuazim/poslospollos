@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useKioskStore } from '@/lib/store';
-import { Logo, Button } from '@/app/components/ui';
+import { Logo, Button } from '@/components/ui';
 
 export default function CustomerNameScreen() {
     const { customerName, setCustomerName, setStep } = useKioskStore();

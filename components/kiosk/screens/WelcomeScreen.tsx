@@ -22,10 +22,10 @@ export default function WelcomeScreen() {
                 {/* Controls */}
                 <div className="pointer-events-auto" onClick={(e) => e.stopPropagation()}>
                     {/* Language Toggle - Refined */}
-                    <div className="bg-black/10 backdrop-blur-md rounded-full p-1 flex">
+                    <div className="bg-[#FFC72C] rounded-full p-1 flex shadow-lg">
                         <button
                             className={`px-6 py-3 rounded-full text-sm font-bold transition-all duration-300 ease-out flex items-center justify-center leading-none ${
-                                language === 'en' ? 'bg-white text-[#AD362B]' : 'text-white/80 hover:text-white hover:bg-white/10'
+                                language === 'en' ? 'bg-white text-[#5a2e18] shadow-sm' : 'text-[#5a2e18]/70 hover:text-[#5a2e18]'
                             }`}
                             onClick={() => setLanguage('en')}
                         >
@@ -33,7 +33,7 @@ export default function WelcomeScreen() {
                         </button>
                         <button
                             className={`px-6 py-3 rounded-full text-sm font-bold transition-all duration-300 ease-out flex items-center justify-center leading-none ${
-                                language === 'id' ? 'bg-white text-[#AD362B]' : 'text-white/80 hover:text-white hover:bg-white/10'
+                                language === 'id' ? 'bg-white text-[#5a2e18] shadow-sm' : 'text-[#5a2e18]/70 hover:text-[#5a2e18]'
                             }`}
                             onClick={() => setLanguage('id')}
                         >

@@ -35,11 +35,27 @@ export default function LiveOrdersPage() {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
     const [selectedStatus, setSelectedStatus] = useState<OrderStatus | 'all'>('all');
+    const [orders, setOrders] = useState(mockOrders);
 
-    const filteredOrders = mockOrders.filter(order => {
+    const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
+        setOrders(prev => prev.map(order => 
+            order.id === orderId ? { ...order, status: newStatus } : order
+        ));
+    };
+
+    const filteredOrders = orders.filter(order => {
         if (selectedStatus !== 'all' && order.status !== selectedStatus) return false;
         return true;
     });
+
+    const getNextAction = (status: OrderStatus) => {
+        switch (status) {
+            case 'ordered': return { label: 'Start Cooking', next: 'in-kitchen' as OrderStatus, color: 'bg-[#3B82F6] hover:bg-[#2563EB] text-white' };
+            case 'in-kitchen': return { label: 'Mark Ready', next: 'ready' as OrderStatus, color: 'bg-[#10B981] hover:bg-[#059669] text-white' };
+            case 'ready': return { label: 'Complete', next: 'picked-up' as OrderStatus, color: 'bg-[#6B7280] hover:bg-[#4B5563] text-white' };
+            default: return null;
+        }
+    };
 
     return (
         <div className="p-4 md:p-6 lg:p-8">
@@ -64,7 +80,7 @@ export default function LiveOrdersPage() {
                             : isDark ? 'bg-[#141414] text-[#555]' : 'bg-white text-[#888]'
                         }`}
                 >
-                    All ({mockOrders.length})
+                    All ({orders.length})
                 </button>
                 {(Object.keys(statusConfig) as OrderStatus[]).slice(0, 3).map((status) => (
                     <button
@@ -76,48 +92,66 @@ export default function LiveOrdersPage() {
                             }`}
                     >
                         <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusConfig[status].color }}></span>
-                        {statusConfig[status].label}
+                        {statusConfig[status].label} ({orders.filter(o => o.status === status).length})
                     </button>
                 ))}
             </div>
 
             {/* Orders Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {filteredOrders.map((order) => (
-                    <div key={order.id} className={`rounded-2xl p-4 flex flex-col h-full ${isDark ? 'bg-[#141414]' : 'bg-white'}`}>
+                {filteredOrders.map((order) => {
+                    const action = getNextAction(order.status);
+                    
+                    return (
+                    <div key={order.id} className={`rounded-2xl p-4 flex flex-col h-full border ${isDark ? 'bg-[#141414] border-[#222]' : 'bg-white border-transparent shadow-sm'}`}>
                         <div className="flex items-center justify-between mb-3">
                             <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>#{order.orderNumber}</span>
-                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: statusConfig[order.status].color }} />
+                            <span className="px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide" 
+                                style={{ backgroundColor: `${statusConfig[order.status].color}20`, color: statusConfig[order.status].color }}>
+                                {statusConfig[order.status].label}
+                            </span>
                         </div>
 
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-7 h-7 bg-[#F4A900] rounded-full flex items-center justify-center text-[#1a1a2e] font-semibold text-[9px]">
+                        <div className="flex items-center gap-2 mb-3 pb-3">
+                            <div className="w-8 h-8 bg-[#F4A900] rounded-full flex items-center justify-center text-[#1a1a2e] font-bold text-[10px]">
                                 {order.customerName[0]}
                             </div>
                             <div>
-                                <p className={`text-[11px] font-medium ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>{order.customerName}</p>
-                                <p className={`text-[8px] ${isDark ? 'text-[#444]' : 'text-[#a8a8a8]'}`}>{order.orderType === 'dine-in' ? 'Dine In' : 'Take Away'} • {order.createdAt}</p>
+                                <p className={`text-[11px] font-bold ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>{order.customerName}</p>
+                                <p className={`text-[9px] ${isDark ? 'text-[#666]' : 'text-[#888]'}`}>{order.orderType === 'dine-in' ? 'Dine In' : 'Take Away'} • {order.createdAt}</p>
                             </div>
                         </div>
 
-                        <div className="space-y-0.5 mb-3 flex-1">
-                            {order.items.map((item, index) => (
-                                <p key={index} className={`text-[10px] ${isDark ? 'text-[#666]' : 'text-[#888]'}`}>{item}</p>
+                        <ul className="space-y-1.5 mb-4 flex-1">
+                            {order.items.map((item, i) => (
+                                <li key={i} className={`text-[11px] flex items-center gap-2 ${isDark ? 'text-[#ccc]' : 'text-[#444]'}`}>
+                                    <span className="w-1 h-1 bg-[#F4A900] rounded-full"></span>
+                                    {item}
+                                </li>
                             ))}
-                        </div>
+                        </ul>
 
-                        <div className="flex items-center justify-between mt-auto">
-                            <p className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>${order.total.toFixed(2)}</p>
-                            <button className={`px-2.5 py-1 rounded-lg text-[9px] font-medium text-white ${order.status === 'ordered' ? 'bg-[#3B82F6]' :
-                                    order.status === 'in-kitchen' ? 'bg-[#10B981]' :
-                                        'bg-[#1a1a2e]'
-                                }`}>
-                                {order.status === 'ordered' ? 'Start' :
-                                    order.status === 'in-kitchen' ? 'Ready' : 'Done'}
-                            </button>
+                        <div className="flex items-center justify-between pt-3 mt-auto mb-3">
+                            <span className={`text-[10px] ${isDark ? 'text-[#666]' : 'text-[#888]'}`}>Total Amount</span>
+                            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>${order.total.toFixed(2)}</span>
                         </div>
+                        
+                        {/* Action Button */}
+                        {action ? (
+                            <button
+                                onClick={() => handleUpdateStatus(order.id, action.next)}
+                                className={`w-full py-2.5 rounded-xl text-[11px] font-bold transition-all active:scale-[0.98] ${action.color}`}
+                            >
+                                {action.label}
+                            </button>
+                        ) : (
+                             <div className={`w-full py-2.5 rounded-xl text-[11px] font-medium text-center ${isDark ? 'bg-[#222] text-[#666]' : 'bg-gray-100 text-gray-400'}`}>
+                                Completed
+                            </div>
+                        )}
                     </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

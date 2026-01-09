@@ -55,6 +55,7 @@ export default function PaymentMethodScreen() {
                                     fill
                                     className={`object-contain transition-opacity duration-300 ease-out ${loadedImages[method.id] ? 'opacity-100' : 'opacity-0'}`}
                                     onLoad={() => handleImageLoad(method.id)}
+                                    sizes="56px"
                                 />
                             </div>
                         </div>

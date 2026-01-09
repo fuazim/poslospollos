@@ -47,6 +47,7 @@ export default function OrderTypeScreen() {
                                 fill
                                 className={`object-contain transition-opacity duration-300 ease-out ${loadedImages['dine-in'] ? 'opacity-100' : 'opacity-0'}`}
                                 onLoad={() => handleImageLoad('dine-in')}
+                                sizes="128px"
                             />
                         </div>
                     </div>
@@ -70,6 +71,7 @@ export default function OrderTypeScreen() {
                                 fill
                                 className={`object-contain transition-opacity duration-300 ease-out ${loadedImages['take-away'] ? 'opacity-100' : 'opacity-0'}`}
                                 onLoad={() => handleImageLoad('take-away')}
+                                sizes="128px"
                             />
                         </div>
                     </div>

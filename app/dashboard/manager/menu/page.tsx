@@ -30,8 +30,15 @@ export default function MenuManagementPage() {
     const isDark = theme === 'dark';
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const [products, setProducts] = useState(mockProducts);
 
-    const filteredProducts = mockProducts.filter(product => {
+    const handleToggleStatus = (productId: string) => {
+        setProducts(prev => prev.map(p => 
+            p.id === productId ? { ...p, isActive: !p.isActive } : p
+        ));
+    };
+
+    const filteredProducts = products.filter(product => {
         if (selectedCategory !== 'All' && product.category !== selectedCategory.toLowerCase()) return false;
         if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
         return true;
@@ -45,7 +52,7 @@ export default function MenuManagementPage() {
                     <h1 className={`text-lg md:text-xl font-bold ${isDark ? 'text-white' : 'text-[#1a1a2e]'}`}>Menu</h1>
                     <p className={`text-[11px] mt-0.5 ${isDark ? 'text-[#555]' : 'text-[#a8a8a8]'}`}>Manage products</p>
                 </div>
-                <button className="flex items-center gap-1.5 px-3 py-2 bg-[#F4A900] text-[#1a1a2e] rounded-xl text-[10px] font-semibold self-start">
+                <button className="flex items-center gap-1.5 px-3 py-2 bg-[#F4A900] text-[#1a1a2e] rounded-xl text-[10px] font-semibold self-start hover:bg-[#e09b00] transition-colors">
                     <span>+</span> Add
                 </button>
             </div>
@@ -58,11 +65,14 @@ export default function MenuManagementPage() {
                 </svg>
                 <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`w-full pl-9 pr-3 py-2 rounded-xl text-[11px] focus:outline-none ${isDark ? 'bg-[#141414] text-white placeholder-[#444]' : 'bg-white text-[#1a1a2e] placeholder-[#a8a8a8]'
-                        }`}
+                    className={`w-full pl-9 pr-3 py-2 rounded-xl text-[11px] focus:outline-none transition-colors border ${
+                        isDark 
+                        ? 'bg-[#141414] border-[#222] text-white placeholder-[#444] focus:border-[#F4A900]' 
+                        : 'bg-white border-gray-100 text-[#1a1a2e] placeholder-[#a8a8a8] focus:border-[#F4A900]'
+                    }`}
                 />
             </div>
 
@@ -74,7 +84,7 @@ export default function MenuManagementPage() {
                         onClick={() => setSelectedCategory(category)}
                         className={`px-3 py-1.5 rounded-xl text-[10px] font-medium transition-all ${selectedCategory === category
                                 ? isDark ? 'bg-[#222] text-white' : 'bg-[#1a1a2e] text-white'
-                                : isDark ? 'bg-[#141414] text-[#555]' : 'bg-white text-[#888]'
+                                : isDark ? 'bg-[#141414] text-[#555] hover:bg-[#222]' : 'bg-white text-[#888] hover:bg-gray-50'
                             }`}
                     >
                         {category}
@@ -91,8 +101,10 @@ export default function MenuManagementPage() {
                         price={product.price}
                         imageUrl={product.imageUrl}
                         isCombo={product.isCombo}
+                        isActive={product.isActive}
                         mode="manager"
                         onEdit={() => console.log('Edit product:', product.id)}
+                        onToggleStatus={() => handleToggleStatus(product.id)}
                     />
                 ))}
             </div>

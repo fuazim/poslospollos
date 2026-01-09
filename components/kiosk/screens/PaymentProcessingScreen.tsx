@@ -45,6 +45,7 @@ export default function PaymentProcessingScreen() {
                             fill
                             className={`object-contain transition-opacity duration-300 ease-out ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                             onLoad={() => setImageLoaded(true)}
+                            sizes="64px"
                         />
                     </div>
                 </div>

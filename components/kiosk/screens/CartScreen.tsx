@@ -118,6 +118,7 @@ export default function CartScreen() {
                                                 fill
                                                 className={`object-cover transition-opacity duration-500 ease-out ${loadedImages[item.id] ? 'opacity-100' : 'opacity-0'}`}
                                                 onLoad={() => handleImageLoad(item.id)}
+                                                sizes="120px"
                                             />
                                         </div>
                                     ) : (
@@ -178,6 +179,7 @@ export default function CartScreen() {
                                                     fill
                                                     className={`object-cover transition-opacity duration-500 ease-out ${loadedImages[`upsell-${item.id}`] ? 'opacity-100' : 'opacity-0'}`}
                                                     onLoad={() => handleImageLoad(`upsell-${item.id}`)}
+                                                    sizes="150px"
                                                 />
                                             </div>
                                         ) : (
